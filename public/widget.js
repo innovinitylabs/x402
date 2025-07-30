@@ -371,36 +371,18 @@
       }
       showStatus('Processing payment...', 'loading');
 
-      // Try to load x402-fetch dynamically
-      let wrapFetchWithPayment;
-      try {
-        const x402Fetch = await import('https://cdn.jsdelivr.net/npm/x402-fetch@0.0.1/+esm');
-        wrapFetchWithPayment = x402Fetch.wrapFetchWithPayment;
-      } catch (importError) {
-        console.warn('x402-fetch import failed, using fallback:', importError);
-        // Fallback: use regular fetch for now
-        wrapFetchWithPayment = (url, options, config) => {
-          console.log('Using fallback fetch for payment');
-          return fetch(url, options);
-        };
-      }
+      // For now, use regular fetch since x402-fetch is not working
+      console.log('Making payment request to:', `${API_BASE}/api/donate`);
 
-      const response = await wrapFetchWithPayment(
-        `${API_BASE}/api/donate`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            amount: selectedAmount
-          })
+      const response = await fetch(`${API_BASE}/api/donate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        {
-          maxValue: BigInt(1000 * 10 ** 6), // Allow up to $1000 USDC
-          wallet: window.ethereum
-        }
-      );
+        body: JSON.stringify({
+          amount: selectedAmount
+        })
+      });
 
       if (response.ok) {
         const result = await response.json();
@@ -421,7 +403,9 @@
           hideStatus();
         }, 3000);
       } else {
-        throw new Error('Payment failed');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Payment response error:', response.status, errorData);
+        throw new Error(errorData.error || `Payment failed (${response.status})`);
       }
     } catch (error) {
       console.error('Donation error:', error);
