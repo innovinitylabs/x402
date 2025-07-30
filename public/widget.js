@@ -248,11 +248,32 @@
 
       // Check if MetaMask is available
       if (typeof window.ethereum !== 'undefined') {
-        const accounts = await window.ethereum.request({
-          method: 'eth_requestAccounts'
-        });
+        let accounts;
 
-        if (accounts.length > 0) {
+        // First try to get accounts without requesting (in case already connected)
+        try {
+          accounts = await window.ethereum.request({
+            method: 'eth_accounts'
+          });
+        } catch (error) {
+          console.log('No existing connection, requesting accounts...');
+        }
+
+        // If no accounts, request them
+        if (!accounts || accounts.length === 0) {
+          try {
+            accounts = await window.ethereum.request({
+              method: 'eth_requestAccounts'
+            });
+          } catch (requestError) {
+            if (requestError.code === 4001) {
+              throw new Error('User rejected the connection request. Please try again.');
+            }
+            throw requestError;
+          }
+        }
+
+        if (accounts && accounts.length > 0) {
           connectedWallet = accounts[0];
 
           // Try to switch to Base Sepolia
@@ -264,29 +285,37 @@
           } catch (switchError) {
             // If Base Sepolia is not added, add it
             if (switchError.code === 4902) {
-              await window.ethereum.request({
-                method: 'wallet_addEthereumChain',
-                params: [{
-                  chainId: '0x14a33',
-                  chainName: 'Base Sepolia',
-                  nativeCurrency: {
-                    name: 'ETH',
-                    symbol: 'ETH',
-                    decimals: 18
-                  },
-                  rpcUrls: ['https://sepolia.base.org'],
-                  blockExplorerUrls: ['https://sepolia.basescan.org']
-                }]
-              });
+              try {
+                await window.ethereum.request({
+                  method: 'wallet_addEthereumChain',
+                  params: [{
+                    chainId: '0x14a33',
+                    chainName: 'Base Sepolia',
+                    nativeCurrency: {
+                      name: 'ETH',
+                      symbol: 'ETH',
+                      decimals: 18
+                    },
+                    rpcUrls: ['https://sepolia.base.org'],
+                    blockExplorerUrls: ['https://sepolia.basescan.org']
+                  }]
+                });
+              } catch (addError) {
+                console.warn('Could not add Base Sepolia network:', addError);
+                // Continue anyway - user can switch manually
+              }
+            } else {
+              console.warn('Could not switch to Base Sepolia:', switchError);
+              // Continue anyway - user can switch manually
             }
           }
 
           const walletStatus = document.getElementById('wallet-status');
           if (walletStatus) {
             walletStatus.innerHTML = `
-                            <div style="color: #00ff88;">✓ Wallet Connected</div>
-                            <div style="font-family: monospace; font-size: 12px; word-break: break-all; margin-top: 8px; color: #00ff88;">${connectedWallet}</div>
-                        `;
+              <div style="color: #00ff88;">✓ Wallet Connected</div>
+              <div style="font-family: monospace; font-size: 12px; word-break: break-all; margin-top: 8px; color: #00ff88;">${connectedWallet}</div>
+            `;
             walletStatus.classList.add('wallet-connected');
           }
 
@@ -301,13 +330,24 @@
 
           showStatus('Wallet connected successfully!', 'success');
           setTimeout(() => hideStatus(), 3000);
+        } else {
+          throw new Error('No accounts found. Please connect your wallet.');
         }
       } else {
         throw new Error('No wallet found. Please install MetaMask or Coinbase Wallet.');
       }
     } catch (error) {
       console.error('Wallet connection error:', error);
-      showStatus(`Connection failed: ${error.message}`, 'error');
+
+      // Provide more helpful error messages
+      let errorMessage = error.message;
+      if (error.message.includes('User rejected')) {
+        errorMessage = 'Connection was rejected. Please try again and approve the request.';
+      } else if (error.message.includes('No wallet found')) {
+        errorMessage = 'No wallet detected. Please install MetaMask or Coinbase Wallet.';
+      }
+
+      showStatus(`Connection failed: ${errorMessage}`, 'error');
       const connectWalletBtn = document.getElementById('connect-wallet-btn');
       if (connectWalletBtn) {
         connectWalletBtn.disabled = false;
@@ -494,6 +534,60 @@
         }
     `;
   document.head.appendChild(style);
+
+  // Check if wallet is already connected
+  async function checkExistingConnection() {
+    if (typeof window.ethereum !== 'undefined') {
+      try {
+        const accounts = await window.ethereum.request({
+          method: 'eth_accounts'
+        });
+
+        if (accounts && accounts.length > 0) {
+          connectedWallet = accounts[0];
+          const walletStatus = document.getElementById('wallet-status');
+          const connectWalletBtn = document.getElementById('connect-wallet-btn');
+          const donateBtn = document.getElementById('donate-btn');
+
+          if (walletStatus) {
+            walletStatus.innerHTML = `
+                <div style="color: #00ff88;">✓ Wallet Connected</div>
+                <div style="font-family: monospace; font-size: 12px; word-break: break-all; margin-top: 8px; color: #00ff88;">${connectedWallet}</div>
+              `;
+            walletStatus.classList.add('wallet-connected');
+          }
+
+          if (connectWalletBtn) {
+            connectWalletBtn.style.display = 'none';
+          }
+
+          if (donateBtn) {
+            donateBtn.disabled = false;
+          }
+
+          console.log('Wallet already connected:', connectedWallet);
+        }
+      } catch (error) {
+        console.log('No existing wallet connection');
+      }
+    }
+  }
+
+  // Initialize widget
+  function initWidget() {
+    const container = document.getElementById('x402-widget');
+    if (!container) {
+      console.error('x402-widget container not found');
+      return;
+    }
+
+    container.innerHTML = createWidgetHTML();
+    updateSelectedAmount();
+    setupEventListeners();
+
+    // Check for existing wallet connection
+    checkExistingConnection();
+  }
 
   // Initialize when DOM is ready
   if (document.readyState === 'loading') {
