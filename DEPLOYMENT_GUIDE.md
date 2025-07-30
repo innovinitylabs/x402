@@ -6,9 +6,56 @@
 
 ## 🎯 Recommended Deployment Options
 
-### 1. Railway (Recommended - Free)
+### 1. Render (Recommended - Free)
 
-Railway is perfect for Node.js apps with automatic deployments.
+Render provides free Node.js hosting with automatic deployments.
+
+#### Quick Deploy:
+1. Go to [Render.com](https://render.com)
+2. Sign up with GitHub
+3. Click "New" → "Web Service"
+4. Connect your GitHub repository
+5. Configure settings:
+   - **Name**: `x402-payment-server`
+   - **Environment**: `Node`
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+6. Add environment variables:
+   ```
+   ADDRESS=0xYourWalletAddressHere
+   NETWORK=base-sepolia
+   FACILITATOR_URL=https://x402.org/facilitator
+   PORT=10000
+   NODE_ENV=production
+   ```
+7. Deploy!
+
+### 2. Vercel (Free)
+
+Vercel offers excellent Node.js support with automatic deployments.
+
+#### Quick Deploy:
+1. Go to [Vercel.com](https://vercel.com)
+2. Sign up with GitHub
+3. Import your repository
+4. Add environment variables in the dashboard:
+   ```
+   ADDRESS=0xYourWalletAddressHere
+   NETWORK=base-sepolia
+   FACILITATOR_URL=https://x402.org/facilitator
+   NODE_ENV=production
+   ```
+5. Deploy!
+
+#### Command Line:
+```bash
+npm install -g vercel
+vercel
+```
+
+### 3. Railway (Paid - $5/month)
+
+Railway offers excellent Node.js hosting with automatic deployments.
 
 #### Quick Deploy:
 1. Go to [Railway.app](https://railway.app)
@@ -32,34 +79,6 @@ railway init
 railway up
 ```
 
-### 2. Vercel (Free)
-
-Vercel offers excellent Node.js support with automatic deployments.
-
-#### Quick Deploy:
-1. Go to [Vercel.com](https://vercel.com)
-2. Sign up with GitHub
-3. Import your repository
-4. Add environment variables in the dashboard
-5. Deploy!
-
-#### Command Line:
-```bash
-npm install -g vercel
-vercel
-```
-
-### 3. Render (Free)
-
-Render provides free Node.js hosting.
-
-1. Go to [Render.com](https://render.com)
-2. Create account and connect GitHub
-3. Create new Web Service
-4. Select your repository
-5. Add environment variables
-6. Deploy!
-
 ### 4. DigitalOcean App Platform
 
 1. Go to [DigitalOcean App Platform](https://www.digitalocean.com/products/app-platform)
@@ -82,16 +101,16 @@ NODE_ENV=production
 ## 🌐 After Deployment
 
 Once deployed, your server will be available at:
-- `https://your-app.railway.app` (Railway)
-- `https://your-app.vercel.app` (Vercel)
 - `https://your-app.onrender.com` (Render)
+- `https://your-app.vercel.app` (Vercel)
+- `https://your-app.railway.app` (Railway - paid)
 
 ## 📋 Widget Embed Code
 
 After deployment, use your server URL:
 
 ```html
-<script src="https://your-app.railway.app/widget.js"></script>
+<script src="https://your-app.onrender.com/widget.js"></script>
 <div id="x402-widget"></div>
 ```
 
@@ -107,12 +126,11 @@ But **NOT** for the actual payment server.
 
 ## 🚀 Quick Deploy Commands
 
-### Railway:
+### Render (Recommended):
 ```bash
-npm install -g @railway/cli
-railway login
-railway init
-railway up
+# Connect via web interface
+# No CLI required
+# Go to render.com and connect your GitHub repo
 ```
 
 ### Vercel:
@@ -121,10 +139,12 @@ npm install -g vercel
 vercel
 ```
 
-### Render:
+### Railway (Paid):
 ```bash
-# Connect via web interface
-# No CLI required
+npm install -g @railway/cli
+railway login
+railway init
+railway up
 ```
 
 ## 🔍 Testing Your Deployment
@@ -133,20 +153,20 @@ After deployment, test your endpoints:
 
 ```bash
 # Health check
-curl https://your-app.railway.app/api/health
+curl https://your-app.onrender.com/api/health
 
 # Widget
-curl https://your-app.railway.app/widget
+curl https://your-app.onrender.com/widget
 
 # Test donation (will require wallet)
-curl -X POST https://your-app.railway.app/api/donate \
+curl -X POST https://your-app.onrender.com/api/donate \
   -H "Content-Type: application/json" \
   -d '{"amount": 1}'
 ```
 
 ## 💡 Pro Tips
 
-1. **Use Railway** for the easiest deployment experience
+1. **Use Render** for the easiest free deployment experience
 2. **Set up automatic deployments** on git push
 3. **Test locally first** with `npm run dev`
 4. **Monitor your logs** for any issues
@@ -164,14 +184,17 @@ curl -X POST https://your-app.railway.app/api/donate \
 ### Debug Commands:
 
 ```bash
-# Check server logs
+# Check server logs (Render)
+# View logs in Render dashboard
+
+# Check server logs (Vercel)
+vercel logs
+
+# Check server logs (Railway)
 railway logs
 
 # View environment variables
-railway variables
-
-# Restart deployment
-railway up
+# Check in your platform's dashboard
 ```
 
 ## 🎉 Success!

@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "tsx src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "tsx src/index.ts",
     "format": "prettier --write \"src/**/*.{ts,js,json,md}\"",
     "lint": "eslint src --ext .ts --fix"
   },
