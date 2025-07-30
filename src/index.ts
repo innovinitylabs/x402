@@ -310,6 +310,108 @@ app.get("/widget", (req, res) => {
             color: #9ca3af;
             text-align: center;
         }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 480px) {
+            .widget-container {
+                padding: 16px;
+                margin: 8px;
+            }
+            
+            .amount-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            
+            .header {
+                font-size: 14px;
+            }
+            
+            .title {
+                font-size: 16px;
+            }
+        }
+        
+        /* Loading animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #f97316;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Success animation */
+        .success-checkmark {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #10b981;
+            position: relative;
+            margin-right: 8px;
+        }
+        
+        .success-checkmark::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 2px;
+            width: 4px;
+            height: 8px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        
+        /* Error icon */
+        .error-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #ef4444;
+            position: relative;
+            margin-right: 8px;
+        }
+        
+        .error-icon::before,
+        .error-icon::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 2px;
+            background: white;
+            top: 7px;
+            left: 4px;
+        }
+        
+        .error-icon::before {
+            transform: rotate(45deg);
+        }
+        
+        .error-icon::after {
+            transform: rotate(-45deg);
+        }
+        
+        /* Pulse animation for wallet connection */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -414,15 +516,16 @@ app.get("/widget", (req, res) => {
             updateAmountDisplay();
         });
         
-        // Connect wallet function
+        // Connect wallet function with enhanced error handling and animations
         async function connectWallet() {
             const statusEl = document.getElementById('wallet-status');
             const btnEl = document.getElementById('connect-wallet-btn');
             const donateBtn = document.getElementById('donate-btn');
             
             try {
-                statusEl.textContent = 'Connecting wallet...';
+                statusEl.innerHTML = '<span class="loading-spinner"></span>Connecting wallet...';
                 btnEl.disabled = true;
+                btnEl.classList.add('pulse');
                 
                 // Check if MetaMask is installed
                 if (typeof window.ethereum === 'undefined') {
@@ -482,17 +585,19 @@ app.get("/widget", (req, res) => {
                 });
                 
                 isWalletConnected = true;
-                statusEl.textContent = 'Wallet connected: ' + accounts[0].slice(0, 6) + '...' + accounts[0].slice(-4);
+                statusEl.innerHTML = '<span class="success-checkmark"></span>Wallet connected: ' + accounts[0].slice(0, 6) + '...' + accounts[0].slice(-4);
                 btnEl.textContent = 'Connected';
                 btnEl.disabled = true;
+                btnEl.classList.remove('pulse');
                 donateBtn.disabled = false;
                 
                 showStatus('Wallet connected successfully!', 'success');
                 
             } catch (error) {
                 console.error('Wallet connection error:', error);
-                statusEl.textContent = 'Failed to connect wallet: ' + error.message;
+                statusEl.innerHTML = '<span class="error-icon"></span>Failed to connect wallet: ' + error.message;
                 btnEl.disabled = false;
+                btnEl.classList.remove('pulse');
                 showStatus('Wallet connection failed: ' + error.message, 'error');
             }
         }
@@ -515,7 +620,7 @@ app.get("/widget", (req, res) => {
             }
             
             button.disabled = true;
-            button.textContent = 'Processing...';
+            button.innerHTML = '<span class="loading-spinner"></span>Processing...';
             showStatus('Initiating payment...', 'loading');
             
             try {
@@ -536,13 +641,23 @@ app.get("/widget", (req, res) => {
                 if (response.ok) {
                     const data = await response.json();
                     showStatus('Thank you for your support! Payment completed successfully!', 'success');
+                    
+                    // Add success animation
+                    button.innerHTML = '<span class="success-checkmark"></span>Payment Successful!';
+                    button.style.background = '#10b981';
+                    
+                    // Reset after 3 seconds
+                    setTimeout(() => {
+                        button.textContent = 'Support Now';
+                        button.style.background = '#f97316';
+                        button.disabled = false;
+                    }, 3000);
                 } else {
                     throw new Error('Payment failed');
                 }
             } catch (error) {
                 console.error('Donation error:', error);
                 showStatus('Payment failed: ' + error.message, 'error');
-            } finally {
                 button.textContent = 'Support Now';
                 button.disabled = false;
             }
@@ -550,7 +665,18 @@ app.get("/widget", (req, res) => {
         
         function showStatus(message, type) {
             const status = document.getElementById('status');
-            status.textContent = message;
+            
+            // Add appropriate icon based on type
+            let icon = '';
+            if (type === 'loading') {
+                icon = '<span class="loading-spinner"></span>';
+            } else if (type === 'success') {
+                icon = '<span class="success-checkmark"></span>';
+            } else if (type === 'error') {
+                icon = '<span class="error-icon"></span>';
+            }
+            
+            status.innerHTML = icon + message;
             status.className = \`status \${type}\`;
             status.style.display = 'block';
             
