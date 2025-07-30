@@ -1,38 +1,62 @@
 # 🚀 Deployment Guide - x402 Universal Payment Server
 
-## ⚠️ Important: GitHub Pages Limitation
+## ⚠️ Important: Always-On Hosting Required
 
-**GitHub Pages can only serve static files, not Node.js servers.** Your payment server needs to run on a platform that supports Node.js.
+**For a payment receiving system, your server must be always online.** Free tiers with inactivity timeouts (like Render's 15-minute timeout) are not suitable for payment servers.
+
+### Why Always-On Matters:
+- ✅ **Instant payment processing** - No cold start delays
+- ✅ **Reliable webhook handling** - Payment confirmations arrive immediately
+- ✅ **Widget responsiveness** - Users expect instant wallet connections
+- ✅ **Professional service** - Payment systems should never be "sleeping"
+
+### Recommended for Payment Servers:
+- 🟢 **Railway** ($5/month) - Always on, perfect for payments
+- 🟢 **DigitalOcean App Platform** - Enterprise-grade reliability
+- 🟡 **Vercel** (Free) - May have cold starts but generally reliable
+- 🔴 **Render** (Free) - 15-minute timeout, not suitable for payments
 
 ## 🎯 Recommended Deployment Options
 
-### 1. Render (Recommended - Free)
+### 1. Railway (Recommended - $5/month)
 
-Render provides free Node.js hosting with automatic deployments.
+Railway offers always-on hosting perfect for payment servers.
 
 #### Quick Deploy:
-1. Go to [Render.com](https://render.com)
+1. Go to [Railway.app](https://railway.app)
 2. Sign up with GitHub
-3. Click "New" → "Web Service"
-4. Connect your GitHub repository
-5. Configure settings:
-   - **Name**: `x402-payment-server`
-   - **Environment**: `Node`
-   - **Build Command**: `npm install`
-   - **Start Command**: `npm start`
-6. Add environment variables:
+3. Click "New Project" → "Deploy from GitHub repo"
+4. Select your repository
+5. Add environment variables:
    ```
    ADDRESS=0xYourWalletAddressHere
    NETWORK=base-sepolia
    FACILITATOR_URL=https://x402.org/facilitator
-   PORT=10000
+   PORT=4021
    NODE_ENV=production
    ```
-7. Deploy!
+6. Deploy!
 
-### 2. Vercel (Free)
+#### Command Line:
+```bash
+npm install -g @railway/cli
+railway login
+railway init
+railway up
+```
 
-Vercel offers excellent Node.js support with automatic deployments.
+### 2. DigitalOcean App Platform (Free tier available)
+
+DigitalOcean offers reliable always-on hosting.
+
+1. Go to [DigitalOcean App Platform](https://www.digitalocean.com/products/app-platform)
+2. Connect your GitHub repository
+3. Configure environment variables
+4. Deploy!
+
+### 3. Vercel (Free - but with limitations)
+
+Vercel offers excellent Node.js support but may have cold starts.
 
 #### Quick Deploy:
 1. Go to [Vercel.com](https://vercel.com)
@@ -53,33 +77,11 @@ npm install -g vercel
 vercel
 ```
 
-### 3. Railway (Paid - $5/month)
+### 4. Render (Free - 15min timeout)
 
-Railway offers excellent Node.js hosting with automatic deployments.
+⚠️ **Warning**: Render free tier has 15-minute inactivity timeout, not suitable for payment servers.
 
-#### Quick Deploy:
-1. Go to [Railway.app](https://railway.app)
-2. Sign up with GitHub
-3. Click "New Project" → "Deploy from GitHub repo"
-4. Select your repository
-5. Add environment variables:
-   ```
-   ADDRESS=0xYourWalletAddressHere
-   NETWORK=base-sepolia
-   FACILITATOR_URL=https://x402.org/facilitator
-   PORT=4021
-   ```
-6. Deploy!
 
-#### Command Line:
-```bash
-npm install -g @railway/cli
-railway login
-railway init
-railway up
-```
-
-### 4. DigitalOcean App Platform
 
 1. Go to [DigitalOcean App Platform](https://www.digitalocean.com/products/app-platform)
 2. Connect your GitHub repository
@@ -101,16 +103,16 @@ NODE_ENV=production
 ## 🌐 After Deployment
 
 Once deployed, your server will be available at:
-- `https://your-app.onrender.com` (Render)
-- `https://your-app.vercel.app` (Vercel)
-- `https://your-app.railway.app` (Railway - paid)
+- `https://your-app.railway.app` (Railway - always on)
+- `https://your-app.vercel.app` (Vercel - may have cold starts)
+- `https://your-app.onrender.com` (Render - 15min timeout)
 
 ## 📋 Widget Embed Code
 
 After deployment, use your server URL:
 
 ```html
-<script src="https://your-app.onrender.com/widget.js"></script>
+<script src="https://your-app.railway.app/widget.js"></script>
 <div id="x402-widget"></div>
 ```
 
@@ -126,25 +128,25 @@ But **NOT** for the actual payment server.
 
 ## 🚀 Quick Deploy Commands
 
-### Render (Recommended):
-```bash
-# Connect via web interface
-# No CLI required
-# Go to render.com and connect your GitHub repo
-```
-
-### Vercel:
-```bash
-npm install -g vercel
-vercel
-```
-
-### Railway (Paid):
+### Railway (Recommended - Always On):
 ```bash
 npm install -g @railway/cli
 railway login
 railway init
 railway up
+```
+
+### Vercel (Free - may have cold starts):
+```bash
+npm install -g vercel
+vercel
+```
+
+### Render (Free - 15min timeout):
+```bash
+# Connect via web interface
+# No CLI required
+# Go to render.com and connect your GitHub repo
 ```
 
 ## 🔍 Testing Your Deployment
@@ -153,24 +155,25 @@ After deployment, test your endpoints:
 
 ```bash
 # Health check
-curl https://your-app.onrender.com/api/health
+curl https://your-app.railway.app/api/health
 
 # Widget
-curl https://your-app.onrender.com/widget
+curl https://your-app.railway.app/widget
 
 # Test donation (will require wallet)
-curl -X POST https://your-app.onrender.com/api/donate \
+curl -X POST https://your-app.railway.app/api/donate \
   -H "Content-Type: application/json" \
   -d '{"amount": 1}'
 ```
 
 ## 💡 Pro Tips
 
-1. **Use Render** for the easiest free deployment experience
+1. **Use Railway** for always-on hosting perfect for payment servers
 2. **Set up automatic deployments** on git push
 3. **Test locally first** with `npm run dev`
 4. **Monitor your logs** for any issues
 5. **Use environment variables** for configuration
+6. **Consider DigitalOcean** for enterprise-grade reliability
 
 ## 🆘 Troubleshooting
 
