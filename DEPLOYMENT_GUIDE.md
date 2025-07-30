@@ -1,80 +1,179 @@
-# 🚀 GitHub Pages Deployment Guide
+# 🚀 Deployment Guide - x402 Universal Payment Server
 
-## Quick Deploy to GitHub Pages
+## ⚠️ Important: GitHub Pages Limitation
 
-### Step 1: Push to GitHub
+**GitHub Pages can only serve static files, not Node.js servers.** Your payment server needs to run on a platform that supports Node.js.
+
+## 🎯 Recommended Deployment Options
+
+### 1. Railway (Recommended - Free)
+
+Railway is perfect for Node.js apps with automatic deployments.
+
+#### Quick Deploy:
+1. Go to [Railway.app](https://railway.app)
+2. Sign up with GitHub
+3. Click "New Project" → "Deploy from GitHub repo"
+4. Select your repository
+5. Add environment variables:
+   ```
+   ADDRESS=0xYourWalletAddressHere
+   NETWORK=base-sepolia
+   FACILITATOR_URL=https://x402.org/facilitator
+   PORT=4021
+   ```
+6. Deploy!
+
+#### Command Line:
 ```bash
-git add .
-git commit -m "Add universal payment server with GitHub Pages support"
-git push origin main
+npm install -g @railway/cli
+railway login
+railway init
+railway up
 ```
 
-### Step 2: Enable GitHub Pages
-1. Go to your repository on GitHub
-2. Click **Settings** tab
-3. Scroll down to **Pages** section
-4. Under **Source**, select **GitHub Actions**
-5. Your site will deploy automatically
+### 2. Vercel (Free)
 
-### Step 3: Access Your Live Site
-Your widget will be available at:
-```
-https://yourusername.github.io/x402
-```
+Vercel offers excellent Node.js support with automatic deployments.
 
-## 🎯 Testing Your Deployment
+#### Quick Deploy:
+1. Go to [Vercel.com](https://vercel.com)
+2. Sign up with GitHub
+3. Import your repository
+4. Add environment variables in the dashboard
+5. Deploy!
 
-### Test the Widget
-1. Open your live site: `https://yourusername.github.io/x402`
-2. Try the donation widget
-3. Verify it works correctly
-
-### Test API Endpoints
+#### Command Line:
 ```bash
-# Health check
-curl https://yourusername.github.io/x402/api/health
-
-# Widget endpoints
-curl https://yourusername.github.io/x402/widget
-curl https://yourusername.github.io/x402/widget.js
+npm install -g vercel
+vercel
 ```
 
-### Embed on Any Website
+### 3. Render (Free)
+
+Render provides free Node.js hosting.
+
+1. Go to [Render.com](https://render.com)
+2. Create account and connect GitHub
+3. Create new Web Service
+4. Select your repository
+5. Add environment variables
+6. Deploy!
+
+### 4. DigitalOcean App Platform
+
+1. Go to [DigitalOcean App Platform](https://www.digitalocean.com/products/app-platform)
+2. Connect your GitHub repository
+3. Configure environment variables
+4. Deploy!
+
+## 🔧 Environment Variables
+
+Set these in your deployment platform:
+
+```bash
+ADDRESS=0xYourWalletAddressHere
+NETWORK=base-sepolia
+FACILITATOR_URL=https://x402.org/facilitator
+PORT=4021
+NODE_ENV=production
+```
+
+## 🌐 After Deployment
+
+Once deployed, your server will be available at:
+- `https://your-app.railway.app` (Railway)
+- `https://your-app.vercel.app` (Vercel)
+- `https://your-app.onrender.com` (Render)
+
+## 📋 Widget Embed Code
+
+After deployment, use your server URL:
+
 ```html
-<script src="https://yourusername.github.io/x402/widget.js"></script>
+<script src="https://your-app.railway.app/widget.js"></script>
 <div id="x402-widget"></div>
 ```
 
-## 🔧 Customization
+## 🎯 GitHub Pages Usage
 
-### Change Wallet Address
-Edit `.env` file:
-```env
-ADDRESS=0xYourNewWalletAddress
+GitHub Pages can still be used for:
+- ✅ **Documentation and guides**
+- ✅ **Static demo pages**
+- ✅ **Configuration examples**
+- ✅ **Widget embed instructions**
+
+But **NOT** for the actual payment server.
+
+## 🚀 Quick Deploy Commands
+
+### Railway:
+```bash
+npm install -g @railway/cli
+railway login
+railway init
+railway up
 ```
 
-### Customize Widget
-Edit `src/index.ts` and modify the widget HTML section.
+### Vercel:
+```bash
+npm install -g vercel
+vercel
+```
 
-### Update Styling
-Modify the CSS in the widget HTML to match your brand.
+### Render:
+```bash
+# Connect via web interface
+# No CLI required
+```
 
-## 🚨 Important Notes
+## 🔍 Testing Your Deployment
 
-1. **Environment Variables**: GitHub Pages doesn't support server-side environment variables. For production, consider using Railway, Vercel, or Heroku.
+After deployment, test your endpoints:
 
-2. **Static Files**: GitHub Pages serves static files only. The server functionality will work for the widget, but API endpoints need a proper server.
+```bash
+# Health check
+curl https://your-app.railway.app/api/health
 
-3. **HTTPS**: GitHub Pages automatically provides HTTPS.
+# Widget
+curl https://your-app.railway.app/widget
+
+# Test donation (will require wallet)
+curl -X POST https://your-app.railway.app/api/donate \
+  -H "Content-Type: application/json" \
+  -d '{"amount": 1}'
+```
+
+## 💡 Pro Tips
+
+1. **Use Railway** for the easiest deployment experience
+2. **Set up automatic deployments** on git push
+3. **Test locally first** with `npm run dev`
+4. **Monitor your logs** for any issues
+5. **Use environment variables** for configuration
+
+## 🆘 Troubleshooting
+
+### Common Issues:
+
+1. **Port binding error**: Set `PORT` environment variable
+2. **Wallet connection fails**: Check network configuration
+3. **Payment fails**: Verify facilitator URL and network
+4. **CORS errors**: Widget embedding should work with proper CORS setup
+
+### Debug Commands:
+
+```bash
+# Check server logs
+railway logs
+
+# View environment variables
+railway variables
+
+# Restart deployment
+railway up
+```
 
 ## 🎉 Success!
 
-Once deployed, you'll have:
-- ✅ Live widget at `https://yourusername.github.io/x402`
-- ✅ Embeddable widget for any website
-- ✅ API endpoints for AI agent payments
-- ✅ Beautiful demo page
-
----
-
-**Ready to deploy! 🚀** 
+Once deployed, your payment server will be live and ready to accept real crypto payments via the x402 protocol! 
