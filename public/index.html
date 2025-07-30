@@ -6,188 +6,247 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>x402 Universal Payment Server - Demo</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: #0f0f23;
-      color: #fff;
+      background: #0a0a0a;
+      color: #ffffff;
       line-height: 1.6;
     }
 
     .container {
       max-width: 1200px;
       margin: 0 auto;
+      padding: 20px;
     }
 
     .header {
       text-align: center;
+      padding: 60px 0;
+      background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+      border-radius: 16px;
       margin-bottom: 40px;
     }
 
-    .header h1 {
-      color: #00ff88;
-      font-size: 2.5em;
-      margin-bottom: 10px;
+    .title {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #00ff88, #00cc6a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .header p {
+    .subtitle {
+      font-size: 20px;
       color: #888;
-      font-size: 1.2em;
+      margin-bottom: 24px;
+    }
+
+    .description {
+      max-width: 600px;
+      margin: 0 auto;
+      color: #ccc;
+      font-size: 16px;
     }
 
     .demo-section {
-      background: #1a1a2e;
-      padding: 30px;
-      border-radius: 10px;
-      margin: 20px 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
     }
 
-    .widget-container {
-      text-align: center;
-      margin: 20px 0;
+    .widget-demo {
+      background: #1a1a1a;
+      border-radius: 16px;
+      padding: 32px;
+      border: 1px solid #333;
+    }
+
+    .widget-demo h3 {
+      font-size: 24px;
+      margin-bottom: 16px;
+      color: #00ff88;
+    }
+
+    .widget-demo p {
+      color: #ccc;
+      margin-bottom: 24px;
     }
 
     .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-      margin: 30px 0;
+      background: #1a1a1a;
+      border-radius: 16px;
+      padding: 32px;
+      border: 1px solid #333;
     }
 
-    .feature {
-      background: #16213e;
-      padding: 20px;
+    .features h3 {
+      font-size: 24px;
+      margin-bottom: 16px;
+      color: #00ff88;
+    }
+
+    .feature-list {
+      list-style: none;
+    }
+
+    .feature-list li {
+      padding: 12px 0;
+      border-bottom: 1px solid #333;
+      color: #ccc;
+    }
+
+    .feature-list li:last-child {
+      border-bottom: none;
+    }
+
+    .feature-list li::before {
+      content: '✅';
+      margin-right: 12px;
+      color: #00ff88;
+    }
+
+    .api-section {
+      background: #1a1a1a;
+      border-radius: 16px;
+      padding: 32px;
+      border: 1px solid #333;
+      margin-bottom: 40px;
+    }
+
+    .api-section h3 {
+      font-size: 24px;
+      margin-bottom: 16px;
+      color: #00ff88;
+    }
+
+    .endpoint {
+      background: #2a2a2a;
       border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
       border-left: 4px solid #00ff88;
     }
 
-    .feature h3 {
+    .endpoint h4 {
       color: #00ff88;
-      margin-top: 0;
+      margin-bottom: 8px;
+    }
+
+    .endpoint p {
+      color: #ccc;
+      font-size: 14px;
     }
 
     .code {
       background: #000;
-      padding: 15px;
-      border-radius: 5px;
-      font-family: 'Courier New', monospace;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 14px;
       overflow-x: auto;
-      margin: 10px 0;
+      border: 1px solid #333;
+    }
+
+    .deployment-section {
+      background: #1a1a1a;
+      border-radius: 16px;
+      padding: 32px;
+      border: 1px solid #333;
+      margin-bottom: 40px;
+    }
+
+    .deployment-section h3 {
+      font-size: 24px;
+      margin-bottom: 16px;
+      color: #00ff88;
+    }
+
+    .deployment-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    .deployment-option {
+      background: #2a2a2a;
+      border-radius: 12px;
+      padding: 24px;
+      border: 2px solid #333;
+      transition: all 0.3s ease;
+    }
+
+    .deployment-option:hover {
+      border-color: #00ff88;
+      transform: translateY(-2px);
+    }
+
+    .deployment-option.recommended {
+      border-color: #00ff88;
+      background: linear-gradient(135deg, #1a2a1a, #2a2a2a);
+    }
+
+    .deployment-option h4 {
+      color: #00ff88;
+      margin-bottom: 12px;
+      font-size: 18px;
+    }
+
+    .deployment-option p {
+      color: #ccc;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    .deployment-option ul {
+      list-style: none;
+      margin-bottom: 20px;
+    }
+
+    .deployment-option li {
+      color: #ccc;
+      font-size: 14px;
+      margin-bottom: 8px;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .deployment-option li::before {
+      content: '✅';
+      position: absolute;
+      left: 0;
+      color: #00ff88;
+    }
+
+    .deployment-option li:contains('❌')::before {
+      content: '❌';
+      color: #ff6b6b;
     }
 
     .btn {
-      background: #00ff88;
-      color: #000;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 5px;
-      text-decoration: none;
       display: inline-block;
-      margin: 10px;
-      font-weight: bold;
-      transition: background 0.3s;
+      background: linear-gradient(135deg, #00ff88, #00cc6a);
+      color: #000;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s ease;
     }
 
     .btn:hover {
-      background: #00cc6a;
-    }
-
-    .warning {
-      background: #ff6b35;
-      color: #fff;
-      padding: 15px;
-      border-radius: 5px;
-      margin: 20px 0;
-    }
-
-    .demo-widget {
-      background: #1a1a2e;
-      padding: 30px;
-      border-radius: 10px;
-      border: 2px solid #00ff88;
-      max-width: 400px;
-      margin: 0 auto;
-    }
-
-    .demo-widget h3 {
-      color: #00ff88;
-      margin-top: 0;
-    }
-
-    .amount-buttons {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin: 20px 0;
-    }
-
-    .amount-btn {
-      background: #333;
-      color: #fff;
-      border: 1px solid #555;
-      padding: 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .amount-btn:hover {
-      background: #555;
-      border-color: #00ff88;
-    }
-
-    .amount-btn.selected {
-      background: #00ff88;
-      color: #000;
-      border-color: #00ff88;
-    }
-
-    .connect-btn {
-      background: #00ff88;
-      color: #000;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 5px;
-      font-weight: bold;
-      width: 100%;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .connect-btn:hover {
-      background: #00cc6a;
-    }
-
-    .steps {
-      background: #16213e;
-      padding: 20px;
-      border-radius: 8px;
-      margin: 20px 0;
-    }
-
-    .steps ol {
-      margin: 0;
-      padding-left: 20px;
-    }
-
-    .steps li {
-      margin: 10px 0;
-    }
-
-    .api-section {
-      background: #16213e;
-      padding: 20px;
-      border-radius: 8px;
-      margin: 20px 0;
-    }
-
-    .api-endpoint {
-      background: #000;
-      padding: 10px;
-      border-radius: 5px;
-      margin: 10px 0;
-      font-family: 'Courier New', monospace;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 255, 136, 0.3);
     }
 
     .footer {
@@ -209,113 +268,139 @@
       color: #00cc6a;
       text-decoration: underline;
     }
+
+    @media (max-width: 768px) {
+      .demo-section {
+        grid-template-columns: 1fr;
+      }
+
+      .deployment-options {
+        grid-template-columns: 1fr;
+      }
+
+      .title {
+        font-size: 32px;
+      }
+    }
   </style>
 </head>
 
 <body>
   <div class="container">
     <div class="header">
-      <h1>🚀 x402 Universal Payment Server</h1>
-      <p>Accept real crypto payments with a simple widget embed</p>
-    </div>
-
-    <div class="warning">
-      <strong>⚠️ Demo Mode:</strong> This is a static demo. For real payments, deploy your own server with your wallet
-      address.
+      <h1 class="title">x402 Universal Payment Server</h1>
+      <p class="subtitle">Accept crypto payments with a simple widget</p>
+      <p class="description">
+        A universal payment server that accepts donations via the x402 protocol.
+        Embed the widget on any website or use the API for AI agent payments.
+      </p>
     </div>
 
     <div class="demo-section">
-      <h2>🎯 Live Widget Demo</h2>
-      <p>This widget demonstrates the donation functionality. In production, it would connect to your deployed server.
-      </p>
-      <div class="widget-container">
-        <div class="demo-widget">
-          <h3>💝 Support This Project</h3>
-          <p style="color: #888;">This is a demo widget. Deploy your own server for real payments!</p>
-          <div class="amount-buttons">
-            <button class="amount-btn" onclick="selectAmount(this, 5)">$5</button>
-            <button class="amount-btn" onclick="selectAmount(this, 10)">$10</button>
-            <button class="amount-btn" onclick="selectAmount(this, 25)">$25</button>
-          </div>
-          <button class="connect-btn" onclick="connectWallet()">Connect Wallet (Demo)</button>
-          <p style="color: #888; font-size: 0.9em; margin-top: 10px;">Deploy your own server to enable real payments</p>
+      <div class="widget-demo">
+        <h3>🎯 Live Demo</h3>
+        <p>Try the donation widget below. Connect your wallet and make a real payment!</p>
+        <div id="x402-widget"></div>
+      </div>
+
+      <div class="features">
+        <h3>✨ Features</h3>
+        <ul class="feature-list">
+          <li>Real crypto payments via x402 protocol</li>
+          <li>Widget embeddable on any website</li>
+          <li>AI agent payment API</li>
+          <li>Custom donation amounts</li>
+          <li>Wallet connection (MetaMask, Coinbase)</li>
+          <li>Base Sepolia testnet support</li>
+          <li>Free hosting on Vercel</li>
+          <li>Open source and customizable</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="api-section">
+      <h3>🔌 API Endpoints</h3>
+      <p style="color: #ccc; margin-bottom: 24px;">Use these endpoints to integrate payments into your applications.</p>
+
+      <div class="endpoint">
+        <h4>GET /api/health</h4>
+        <p>Health check endpoint</p>
+        <div class="code">curl https://your-app.vercel.app/api/health</div>
+      </div>
+
+      <div class="endpoint">
+        <h4>GET /api/widget</h4>
+        <p>Widget HTML page</p>
+        <div class="code">curl https://your-app.vercel.app/api/widget</div>
+      </div>
+
+      <div class="endpoint">
+        <h4>POST /api/donate</h4>
+        <p>Process a donation payment</p>
+        <div class="code">curl -X POST https://your-app.vercel.app/api/donate \
+          -H "Content-Type: application/json" \
+          -d '{"amount": 5}'</div>
+      </div>
+
+      <div class="endpoint">
+        <h4>POST /api/pay-service</h4>
+        <p>Process AI agent service payment</p>
+        <div class="code">curl -X POST https://your-app.vercel.app/api/pay-service \
+          -H "Content-Type: application/json" \
+          -d '{"serviceId": "ai-service", "amount": 10, "walletAddress": "0x..."}'</div>
+      </div>
+    </div>
+
+    <div class="deployment-section">
+      <h3>🚀 Deployment Options</h3>
+      <p style="color: #ccc; margin-bottom: 24px;">Choose how to deploy your payment server.</p>
+
+      <div class="deployment-options">
+        <div class="deployment-option recommended">
+          <h4>🚀 Vercel (Free)</h4>
+          <p><strong>Recommended for Payment Servers</strong></p>
+          <ul>
+            <li>Always-on hosting</li>
+            <li>Instant payment processing</li>
+            <li>Professional reliability</li>
+            <li>Perfect for production</li>
+          </ul>
+          <a href="https://vercel.com" class="btn" target="_blank">Deploy to Vercel</a>
+        </div>
+
+        <div class="deployment-option">
+          <h4>📄 GitHub Pages (Free)</h4>
+          <p><strong>Static Demo Only</strong></p>
+          <ul>
+            <li>Free hosting</li>
+            <li>Documentation</li>
+            <li>❌ No server functionality</li>
+            <li>❌ No real payments</li>
+          </ul>
+          <a href="https://github.com/innovinitylabs/x402" class="btn" target="_blank">View on GitHub</a>
+        </div>
+
+        <div class="deployment-option">
+          <h4>☁️ Render (Free)</h4>
+          <p><strong>Free with Keep-Alive</strong></p>
+          <ul>
+            <li>Free hosting</li>
+            <li>15-minute timeout</li>
+            <li>Keep-alive workaround</li>
+            <li>Good for testing</li>
+          </ul>
+          <a href="https://render.com" class="btn" target="_blank">Deploy to Render</a>
         </div>
       </div>
     </div>
 
-    <div class="features">
-      <div class="feature">
-        <h3>💰 Real Crypto Payments</h3>
-        <p>Accept USDC payments on Base Sepolia testnet using the x402 protocol</p>
-      </div>
-      <div class="feature">
-        <h3>🔗 Wallet Integration</h3>
-        <p>Connect MetaMask or Coinbase Wallet for seamless payments</p>
-      </div>
-      <div class="feature">
-        <h3>🤖 AI Agent Ready</h3>
-        <p>API endpoints for automated AI agent payments</p>
-      </div>
-      <div class="feature">
-        <h3>📱 Responsive Design</h3>
-        <p>Beautiful, modern UI that works on all devices</p>
-      </div>
-    </div>
-
-    <div class="demo-section">
-      <h2>🚀 Quick Start</h2>
-      <div class="steps">
-        <p><strong>To deploy your own payment server:</strong></p>
-        <ol>
-          <li>Fork this repository</li>
-          <li>Update your wallet address in <code>.env</code></li>
-          <li>Deploy to GitHub Pages or your preferred platform</li>
-          <li>Embed the widget on your website</li>
-        </ol>
-      </div>
-
-      <div style="text-align: center; margin: 20px 0;">
-        <a href="https://github.com/innovinitylabs/x402" class="btn">📁 View on GitHub</a>
-        <a href="DEPLOYMENT_GUIDE.md" class="btn">📖 Deployment Guide</a>
-        <a href="QUICKSTART.md" class="btn">⚡ Quick Start</a>
-      </div>
-    </div>
-
-    <div class="demo-section">
-      <h2>📋 Widget Embed Code</h2>
+    <div class="api-section">
+      <h3>📋 Widget Embed Code</h3>
+      <p style="color: #ccc; margin-bottom: 16px;">After deploying your server, use this embed code:</p>
       <div class="code">
-        &lt;script src="https://your-domain.com/widget.js"&gt;&lt;/script&gt;
+        &lt;script src="https://your-app.vercel.app/widget.js"&gt;&lt;/script&gt;
         &lt;div id="x402-widget"&gt;&lt;/div&gt;
       </div>
-    </div>
-
-    <div class="demo-section">
-      <h2>🔧 API Endpoints</h2>
-      <div class="api-section">
-        <h3>Donation Endpoints:</h3>
-        <div class="api-endpoint">POST /api/donate - Standard donation</div>
-        <div class="api-endpoint">POST /api/donate/custom - Custom amount donation</div>
-
-        <h3>AI Agent Endpoints:</h3>
-        <div class="api-endpoint">POST /api/pay/service - Pay for AI service</div>
-        <div class="api-endpoint">POST /api/service - Use paid service</div>
-
-        <h3>Widget Endpoints:</h3>
-        <div class="api-endpoint">GET /widget - Widget HTML</div>
-        <div class="api-endpoint">GET /widget.js - Widget JavaScript</div>
-      </div>
-    </div>
-
-    <div class="demo-section">
-      <h2>🎯 Features</h2>
-      <ul>
-        <li><strong>Real Crypto Integration:</strong> Uses x402 protocol for actual USDC payments</li>
-        <li><strong>Wallet Connection:</strong> Supports MetaMask and Coinbase Wallet</li>
-        <li><strong>Dynamic Amounts:</strong> Real-time amount updates in the widget</li>
-        <li><strong>AI Agent Support:</strong> API endpoints for automated payments</li>
-        <li><strong>Session Management:</strong> Tracks payment sessions and service usage</li>
-        <li><strong>Production Ready:</strong> Includes deployment guides and templates</li>
-      </ul>
     </div>
 
     <div class="footer">
@@ -324,26 +409,7 @@
     </div>
   </div>
 
-  <script>
-    let selectedAmount = 0;
-
-    function selectAmount(button, amount) {
-      // Remove selected class from all buttons
-      document.querySelectorAll('.amount-btn').forEach(btn => {
-        btn.classList.remove('selected');
-      });
-
-      // Add selected class to clicked button
-      button.classList.add('selected');
-      selectedAmount = amount;
-
-      console.log(`Selected amount: $${amount}`);
-    }
-
-    function connectWallet() {
-      alert('This is a demo! In production, this would connect to your wallet and enable real payments.\n\nTo test real payments:\n1. Deploy your own server\n2. Update the wallet address\n3. Connect your MetaMask or Coinbase Wallet');
-    }
-  </script>
+  <script src="/widget.js"></script>
 </body>
 
 </html>

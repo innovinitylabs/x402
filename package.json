@@ -6,10 +6,11 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx src/index.ts",
-    "build": "tsc",
+    "build": "echo 'No build step needed for Vercel'",
     "start": "tsx src/index.ts",
     "format": "prettier --write \"src/**/*.{ts,js,json,md}\"",
-    "lint": "eslint src --ext .ts --fix"
+    "lint": "eslint src --ext .ts --fix",
+    "vercel-build": "echo 'Vercel will handle the build'"
   },
   "dependencies": {
     "cors": "^2.8.5",
