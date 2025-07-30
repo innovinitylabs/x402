@@ -1,5 +1,5 @@
-// x402 Universal Payment Widget
-// Embed this script on any website to add crypto donation functionality
+// x402 Universal Payment Widget - Simplified Version
+// This version doesn't rely on external x402-fetch for testing
 
 (function () {
   'use strict';
@@ -316,7 +316,7 @@
     }
   }
 
-  // Handle donation function
+  // Handle donation function (simplified)
   async function handleDonation() {
     if (!connectedWallet) {
       showStatus('Please connect your wallet first', 'error');
@@ -331,44 +331,24 @@
       }
       showStatus('Processing payment...', 'loading');
 
-      // Try to load x402-fetch dynamically
-      let wrapFetchWithPayment;
-      try {
-        const x402Fetch = await import('https://cdn.jsdelivr.net/npm/x402-fetch@0.0.1/+esm');
-        wrapFetchWithPayment = x402Fetch.wrapFetchWithPayment;
-      } catch (importError) {
-        console.warn('x402-fetch import failed, using fallback:', importError);
-        // Fallback: use regular fetch for now
-        wrapFetchWithPayment = (url, options, config) => {
-          console.log('Using fallback fetch for payment');
-          return fetch(url, options);
-        };
-      }
-
-      const response = await wrapFetchWithPayment(
-        `${API_BASE}/api/donate`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            amount: selectedAmount
-          })
+      // Use regular fetch for now (simplified version)
+      const response = await fetch(`${API_BASE}/api/donate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        {
-          maxValue: BigInt(1000 * 10 ** 6), // Allow up to $1000 USDC
-          wallet: window.ethereum
-        }
-      );
+        body: JSON.stringify({
+          amount: selectedAmount
+        })
+      });
 
       if (response.ok) {
         const result = await response.json();
-        showStatus('Payment completed successfully!', 'success');
+        showStatus('Payment request sent! Check your wallet for approval.', 'success');
         if (donateBtn) {
           donateBtn.style.background = 'linear-gradient(135deg, #00ff88, #00cc6a)';
           donateBtn.style.color = '#000';
-          donateBtn.innerHTML = '<span class="success-checkmark"></span>Thank you!';
+          donateBtn.innerHTML = '<span class="success-checkmark"></span>Request Sent!';
         }
 
         setTimeout(() => {
@@ -381,20 +361,12 @@
           hideStatus();
         }, 3000);
       } else {
-        throw new Error('Payment failed');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Payment failed');
       }
     } catch (error) {
       console.error('Donation error:', error);
-
-      // Provide more helpful error messages
-      let errorMessage = error.message;
-      if (error.message.includes('Failed to fetch dynamically imported module')) {
-        errorMessage = 'Payment library failed to load. Please refresh the page and try again.';
-      } else if (error.message.includes('fetch')) {
-        errorMessage = 'Network error. Please check your connection and try again.';
-      }
-
-      showStatus(`Payment failed: ${errorMessage}`, 'error');
+      showStatus(`Payment failed: ${error.message}`, 'error');
       const donateBtn = document.getElementById('donate-btn');
       if (donateBtn) {
         donateBtn.disabled = false;
