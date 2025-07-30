@@ -1,5 +1,5 @@
-import { paymentMiddleware } from 'x402-express';
-import cors from 'cors';
+const { paymentMiddleware } = require('x402-express');
+const cors = require('cors');
 
 // Enable CORS for widget embedding
 const corsMiddleware = cors({
@@ -10,7 +10,7 @@ const corsMiddleware = cors({
 // In-memory storage for payment sessions
 const paymentSessions = new Map();
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
