@@ -23,17 +23,16 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
-    - name: Build
-      run: npm run build
-      
     - name: Prepare static files
       run: |
         mkdir -p dist
         cp -r public/* dist/
-        cp src/index.ts dist/
-        cp package.json dist/
-        cp tsconfig.json dist/
-        cp .env dist/
+        cp demo.html dist/
+        cp README.md dist/
+        cp DEPLOYMENT_GUIDE.md dist/
+        cp QUICKSTART.md dist/
+        cp config-template.js dist/
+        cp test-server.js dist/
       
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
