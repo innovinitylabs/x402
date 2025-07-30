@@ -1,273 +1,259 @@
-# x402 payments protocol
+# x402 Universal Payment Server
 
-> "1 line of code to accept digital dollars. No fee, 2 second settlement, $0.001 minimum payment."
+A universal payment server that enables both widget donations and AI agent payments using the [x402 protocol](https://x402.org/). This server makes it easy for anyone to receive crypto payments through a simple widget or API endpoints.
 
-```typescript
-app.use(
-  // How much you want to charge, and where you want the funds to land
-  paymentMiddleware("0xYourAddress", { "/your-endpoint": "$0.01" })
-);
-// That's it! See examples/typescript/servers/express.ts for a complete example. Instruction below for running on base-sepolia.
+## 🚀 Features
+
+- **Widget Donations**: Embed a beautiful donation widget on any website
+- **AI Agent Payments**: Handle payments from AI agents for services
+- **Custom Amounts**: Support for custom donation amounts
+- **Session Management**: Track payment sessions and validate them
+- **CORS Enabled**: Works across different domains
+- **Simple Integration**: Just a few lines of code to get started
+
+## 📋 Prerequisites
+
+- Node.js 18+ and npm
+- A crypto wallet address to receive payments
+- (Optional) Coinbase Developer Platform account for mainnet
+
+## 🛠️ Installation
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/your-username/x402-universal-payment-server.git
+   cd x402-universal-payment-server
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment**:
+   ```bash
+   # Copy the example environment file
+   cp .env.example .env
+   
+   # Edit .env with your wallet address
+   ADDRESS=0xYourWalletAddress
+   ```
+
+4. **Start the server**:
+   ```bash
+   npm run dev
+   ```
+
+## 🔧 Configuration
+
+Create a `.env` file with the following variables:
+
+```env
+# Your wallet address to receive payments
+ADDRESS=0x5e051c9106071baF1e4c087e3e06Fdd17396A433
+
+# x402 Facilitator URL (use testnet for development)
+FACILITATOR_URL=https://x402.org/facilitator
+
+# Network (base-sepolia for testnet, base for mainnet)
+NETWORK=base-sepolia
+
+# Server port
+PORT=4021
 ```
 
-## Philosophy
+## 📡 API Endpoints
 
-Payments on the internet are fundamentally flawed. Credit Cards are high friction, hard to accept, have minimum payments that are far too high, and don't fit into the programmatic nature of the internet.
-It's time for an open, internet-native form of payments. A payment rail that doesn't have high minimums + % based fee. Payments that are amazing for humans and AI agents.
-
-## Principals
-
-- **Open standard:** the x402 protocol will never force reliance on a single party
-- **HTTP Native:** x402 is meant to seamlessly compliment the existing HTTP request made by traditional web services, it should not mandate additional requests outside the scope of a typical client / server flow.
-- **Chain and token agnostic:** we welcome contributions that add support for new chains, signing standards, or schemes, so long as they meet our acceptance criteria laid out in [CONTRIBUTING.md](https://github.com/coinbase/x402/blob/main/CONTRIBUTING.md)
-- **Trust minimizing:** all payment schemes must not allow for the facilitator or resource server to move funds, other than in accordance with client intentions
-- **Easy to use:** x402 needs to be 10x better than existing ways to pay on the internet. This means abstracting as many details of crypto as possible away from the client and resource server, and into the facilitator. This means the client/server should not need to think about gas, rpc, etc.
-
-## Ecosystem
-
-The x402 ecosystem is growing! Check out our [ecosystem page](https://x402.org/ecosystem) to see projects building with x402, including:
-
-- Client-side integrations
-- Services and endpoints
-- Ecosystem infrastructure and tooling
-- Learning and community resources
-
-Want to add your project to the ecosystem? See our [demo site README](https://github.com/coinbase/x402/tree/main/typescript/site#adding-your-project-to-the-ecosystem) for detailed instructions on how to submit your project.
-
-**Roadmap:** see [ROADMAP.md](https://github.com/coinbase/x402/blob/main/ROADMAP.md)
-
-## Terms:
-
-- `resource`: Something on the internet. This could be a webpage, file server, RPC service, API, any resource on the internet that accepts HTTP / HTTPS requests.
-- `client`: An entity wanting to pay for a resource.
-- `facilitator server`: A server that facilitates verification and execution of on-chain payments.
-- `resource server`: An HTTP server that provides an API or other resource for a client.
-
-## Technical Goals:
-
-- Permissionless and secure for clients and servers
-- Gassless for client and resource servers
-- Minimal integration for the resource server and client (1 line for the server, 1 function for the client)
-- Ability to trade off speed of response for guarantee of payment
-- Extensible to different payment flows and chains
-
-## V1 Protocol
-
-The `x402` protocol is a chain agnostic standard for payments on top of HTTP, leverage the existing `402 Payment Required` HTTP status code to indicate that a payment is required for access to the resource.
-
-It specifies:
-
-1. A schema for how servers can respond to clients to facilitate payment for a resource (`PaymentRequirements`)
-2. A standard header `X-PAYMENT` that is set by clients paying for resources
-3. A standard schema and encoding method for data in the `X-PAYMENT` header
-4. A recommended flow for how payments should be verified and settled by a resource server
-5. A REST specification for how a resource server can perform verification and settlement against a remote 3rd party server (`facilitator`)
-6. A specification for a `X-PAYMENT-RESPONSE` header that can be used by resource servers to communicate blockchain transactions details to the client in their HTTP response
-
-### V1 Protocol Sequencing
-
-![](./static/x402-protocol-flow.png)
-
-The following outlines the flow of a payment using the `x402` protocol. Note that steps (1) and (2) are optional if the client already knows the payment details accepted for a resource.
-
-1. `Client` makes an HTTP request to a `resource server`.
-
-2. `Resource server` responds with a `402 Payment Required` status and a `Payment Required Response` JSON object in the response body.
-
-3. `Client` selects one of the `paymentRequirements` returned by the server response and creates a `Payment Payload` based on the `scheme` of the `paymentRequirements` they have selected.
-
-4. `Client` sends the HTTP request with the `X-PAYMENT` header containing the `Payment Payload` to the resource server.
-
-5. `Resource server` verifies the `Payment Payload` is valid either via local verification or by POSTing the `Payment Payload` and `Payment Requirements` to the `/verify` endpoint of a `facilitator server`.
-
-6. `Facilitator server` performs verification of the object based on the `scheme` and `network` of the `Payment Payload` and returns a `Verification Response`.
-
-7. If the `Verification Response` is valid, the resource server performs the work to fulfill the request. If the `Verification Response` is invalid, the resource server returns a `402 Payment Required` status and a `Payment Required Response` JSON object in the response body.
-
-8. `Resource server` either settles the payment by interacting with a blockchain directly, or by POSTing the `Payment Payload` and `Payment PaymentRequirements` to the `/settle` endpoint of a `facilitator server`.
-
-9. `Facilitator server` submits the payment to the blockchain based on the `scheme` and `network` of the `Payment Payload`.
-
-10. `Facilitator server` waits for the payment to be confirmed on the blockchain.
-
-11. `Facilitator server` returns a `Payment Execution Response` to the resource server.
-
-12. `Resource server` returns a `200 OK` response to the `Client` with the resource they requested as the body of the HTTP response, and a `X-PAYMENT-RESPONSE` header containing the `Settlement Response` as Base64 encoded JSON if the payment was executed successfully.
-
-### Type Specifications
-
-#### Data types
-
-**Payment Required Response**
-
-```json5
-{
-  // Version of the x402 payment protocol
-  x402Version: int,
-
-  // List of payment requirements that the resource server accepts. A resource server may accept on multiple chains, or in multiple currencies.
-  accepts: [paymentRequirements]
-
-  // Message from the resource server to the client to communicate errors in processing payment
-  error: string
-}
+### Health Check
+```http
+GET /api/health
 ```
 
-**paymentRequirements**
-
-```json5
-{
-  // Scheme of the payment protocol to use
-  scheme: string;
-
-  // Network of the blockchain to send payment on
-  network: string;
-
-  // Maximum amount required to pay for the resource in atomic units of the asset
-  maxAmountRequired: uint256 as string;
-
-  // URL of resource to pay for
-  resource: string;
-
-  // Description of the resource
-  description: string;
-
-  // MIME type of the resource response
-  mimeType: string;
-
-  // Output schema of the resource response
-  outputSchema?: object | null;
-
-  // Address to pay value to
-  payTo: string;
-
-  // Maximum time in seconds for the resource server to respond
-  maxTimeoutSeconds: number;
-
-  // Address of the EIP-3009 compliant ERC20 contract
-  asset: string;
-
-  // Extra information about the payment details specific to the scheme
-  // For `exact` scheme on a EVM network, expects extra to contain the records `name` and `version` pertaining to asset
-  extra: object | null;
-}
+### Widget
+```http
+GET /widget
+GET /widget.js
 ```
 
-**`Payment Payload`** (included as the `X-PAYMENT` header in base64 encoded json)
-
-```json5
-{
-  // Version of the x402 payment protocol
-  x402Version: number;
-
-  // scheme is the scheme value of the accepted `paymentRequirements` the client is using to pay
-  scheme: string;
-
-  // network is the network id of the accepted `paymentRequirements` the client is using to pay
-  network: string;
-
-  // payload is scheme dependent
-  payload: <scheme dependent>;
-}
+### Donations
+```http
+POST /api/donate
+POST /api/donate/custom
 ```
 
-#### Facilitator Types & Interface
+### AI Agent Services
+```http
+POST /api/pay/service
+POST /api/service
+```
 
-A `facilitator server` is a 3rd party service that can be used by a `resource server` to verify and settle payments, without the `resource server` needing to have access to a blockchain node or wallet.
+### Session Management
+```http
+GET /api/session/:sessionId
+GET /api/sessions
+```
 
-**POST /verify**. Verify a payment with a supported scheme and network:
+## 🎨 Widget Integration
 
-- Request body JSON:
-  ```json5
-  {
-    x402Version: number;
-    paymentHeader: string;
-    paymentRequirements: paymentRequirements;
-  }
-  ```
-- Response:
-  ```json5
-  {
-    isValid: boolean;
-    invalidReason: string | null;
-  }
-  ```
+### Option 1: Simple Embed
+Add this to your HTML:
+```html
+<script src="http://localhost:4021/widget.js"></script>
+<div id="x402-widget"></div>
+```
 
-**POST /settle**. Settle a payment with a supported scheme and network:
+### Option 2: Direct iframe
+```html
+<iframe 
+  src="http://localhost:4021/widget" 
+  style="border: none; width: 100%; height: 500px; max-width: 400px; border-radius: 12px;">
+</iframe>
+```
 
-- Request body JSON:
+### Option 3: Custom Styling
+```html
+<div style="max-width: 400px; margin: 0 auto;">
+  <script src="http://localhost:4021/widget.js"></script>
+  <div id="x402-widget"></div>
+</div>
+```
 
-  ```json5
-  {
-    x402Version: number;
-    paymentHeader: string;
-    paymentRequirements: paymentRequirements;
-  }
-  ```
+## 🤖 AI Agent Integration
 
-- Response:
+### 1. Request Service Payment
+```javascript
+const response = await fetch('http://localhost:4021/api/pay/service', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    serviceRequest: 'Generate a weather report for New York',
+    walletAddress: '0xReceiverAddress',
+    amount: 0.1
+  })
+});
 
-  ```json5
-  {
-    // Whether the payment was successful
-    success: boolean;
+const { sessionId } = await response.json();
+```
 
-    // Error message from the facilitator server
-    error: string | null;
+### 2. Use the Service
+```javascript
+const serviceResponse = await fetch('http://localhost:4021/api/service', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    sessionId: sessionId,
+    request: 'Generate a weather report for New York'
+  })
+});
 
-    // Transaction hash of the settled payment
-    txHash: string | null;
+const result = await serviceResponse.json();
+```
 
-    // Network id of the blockchain the payment was settled on
-    networkId: string | null;
-  }
-  ```
+## 💡 Usage Examples
 
-**GET /supported**. Get supported payment schemes and networks:
+### For Website Owners
+1. Add the widget to your website
+2. Users can donate with USDC
+3. Receive payments instantly to your wallet
 
-- Response:
-  ```json5
-  {
-    kinds: [
-      {
-        "scheme": string,
-        "network": string,
-      }
-    ]
-  }
-  ```
+### For AI Agents
+1. Send a payment request with service details
+2. Complete the payment using x402 protocol
+3. Use the service and get results
 
-### Schemes
+### For Service Providers
+1. Deploy this server
+2. Configure your wallet address
+3. AI agents can pay for your services automatically
 
-A scheme is a logical way of moving money.
+## 🔒 Security Considerations
 
-Blockchains allow for a large number of flexible ways to move money. To help facilitate an expanding number of payment use cases, the `x402` protocol is extensible to different ways of settling payments via its `scheme` field.
+- **Production**: Use HTTPS and secure environment variables
+- **Database**: Replace in-memory storage with Redis/PostgreSQL
+- **Validation**: Add proper input validation and rate limiting
+- **Authentication**: Implement proper session management
+- **Monitoring**: Add logging and monitoring for production use
 
-Each payment scheme may have different operational functionality depending on what actions are necessary to fulfill the payment.
-For example `exact`, the first scheme shipping as part of the protocol, would have different behavior than `upto`. `exact` transfers a specific amount (ex: pay $1 to read an article), while a theoretical `upto` would transfer up to an amount, based on the resources consumed during a request (ex: generating tokens from an LLM).
+## 🚀 Deployment
 
-See `specs/schemes` for more details on schemes, and see `specs/schemes/exact/scheme_exact_evm.md` to see the first proposed scheme for exact payment on EVM chains.
+### Local Development
+```bash
+npm run dev
+```
 
-### Schemes vs Networks
+### Production Build
+```bash
+npm run build
+npm start
+```
 
-Because a scheme is a logical way of moving money, the way a scheme is implemented can be different for different blockchains. (ex: the way you need to implement `exact` on Ethereum is very different from the way you need to implement `exact` on Solana).
+### Docker Deployment
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY dist ./dist
+EXPOSE 4021
+CMD ["node", "dist/index.js"]
+```
 
-Clients and facilitators must explicitly support different `(scheme, network)` pairs in order to be able to create proper payloads and verify / settle payments.
+### GitHub Actions (for GitHub Pages)
+```yaml
+name: Deploy to GitHub Pages
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+      - run: npm ci
+      - run: npm run build
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+```
 
-## Running example
+## 📚 x402 Protocol
 
-1. From `examples/typescript` run `pnpm install` and `pnpm build` to ensure all dependent packages and examples are setup.
+This server implements the [x402 protocol](https://x402.org/), which:
 
-2. Select a server, i.e. express, and `cd` into that example. Add your server's ethereum address to get paid to into the `.env` file, and then run `pnpm dev` in that directory.
+- Uses HTTP 402 status code for payment requests
+- Enables instant crypto payments
+- Works with any EVM-compatible blockchain
+- Requires no user registration
+- Supports automated AI agent payments
 
-3. Select a client, i.e. axios, and `cd` into that example. Add your private key for the account making payments into the `.env` file, and then run `pnpm dev` in that directory.
+## 🤝 Contributing
 
-You should see activity across both terminals, and the client terminal will display a weather report.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
-## Running tests
+## 📄 License
 
-1. Navigate to the typescript directory: `cd typescript`
-2. Install dependencies: `pnpm install`
-3. Run the unit tests: `pnpm test`
+MIT License - see [LICENSE](LICENSE) file for details.
 
-This will run the unit tests for the x402 packages.
+## 🆘 Support
+
+- **Documentation**: [x402.org](https://x402.org/)
+- **GitHub Issues**: [Report bugs here](https://github.com/your-username/x402-universal-payment-server/issues)
+- **Discord**: [Join the community](https://discord.gg/invite/cdp)
+
+## 🙏 Acknowledgments
+
+- Built on the [x402 protocol](https://x402.org/)
+- Inspired by the need for universal crypto payments
+- Thanks to the Coinbase Developer Platform team
+
+---
+
+**Made with ❤️ for the crypto community**
