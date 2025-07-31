@@ -2,6 +2,7 @@
   "name": "x402-universal-payment-server",
   "version": "1.0.0",
   "description": "Universal payment server for x402 protocol - handles both widget donations and AI agent payments",
+  "type": "module",
   "main": "api/donate.js",
   "scripts": {
     "dev": "tsx src/index.ts",
