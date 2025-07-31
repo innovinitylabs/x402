@@ -9,15 +9,5 @@
       "src": "public/**/*",
       "use": "@vercel/static"
     }
-  ],
-  "routes": [
-    {
-      "src": "/widget.js",
-      "dest": "/public/widget.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/public/index.html"
-    }
   ]
 }
