@@ -12,10 +12,6 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
       "src": "/widget.js",
       "dest": "/public/widget.js"
     },
@@ -23,8 +19,5 @@
       "src": "/(.*)",
       "dest": "/public/index.html"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
