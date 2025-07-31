@@ -45,6 +45,9 @@ module.exports = async function handler(req, res) {
       sessionId
     };
 
+    // Log config for debugging
+    console.log('x402 payment config:', config);
+
     // Apply x402 payment middleware (this will trigger 402 if payment required)
     await new Promise((resolve, reject) => {
       paymentMiddleware(config)(req, res, (err) => {
@@ -69,7 +72,13 @@ module.exports = async function handler(req, res) {
     console.error('Donation error:', error);
     return res.status(500).json({
       error: 'Payment processing failed',
-      details: error.message
+      details: error.message,
+      stack: error.stack,
+      env: {
+        ADDRESS: process.env.ADDRESS,
+        FACILITATOR_URL: process.env.FACILITATOR_URL,
+        NETWORK: process.env.NETWORK
+      }
     });
   }
 }; 
